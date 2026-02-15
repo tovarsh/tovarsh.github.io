@@ -1,0 +1,1260 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  <link rel="canonical" href="https://log.cns.red//Spring-WebSocket/">
+  
+  <meta name="generator" content="Hexo 7.1.1">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>SpringBoot WebSocket 代理模式、客户端模式 - 钟意博客</title>
+
+  
+    <meta name="description" content="Spring+WebSocket的相关实践">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot WebSocket 代理模式、客户端模式">
+<meta property="og:url" content="https://log.cns.red/Spring-WebSocket/">
+<meta property="og:site_name" content="钟意博客">
+<meta property="og:description" content="Spring+WebSocket的相关实践">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://log.cns.red/favicon.ico">
+<meta property="article:published_time" content="2025-06-07T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-13T10:53:03.115Z">
+<meta property="article:author" content="钟意">
+<meta property="article:tag" content="业务">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://log.cns.red/favicon.ico">
+  
+  
+
+  <meta name="keywords" content="业务">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="钟意博客" type="application/atom+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+
+  
+    
+<link rel="stylesheet" href="/custom/css/ZYCode.css">
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"钟意","sameAs":[],"image":"https://log.cns.red/favicon.ico"},"dateCreated":"2025-06-07T16:00:00+08:00","dateModified":"2026-02-13T18:53:03+08:00","datePublished":"2025-06-07T16:00:00+08:00","description":"","headline":"SpringBoot WebSocket 代理模式、客户端模式","mainEntityOfPage":{"@type":"WebPage","@id":"https://log.cns.red/Spring-WebSocket/"},"publisher":{"@type":"Organization","name":"钟意","sameAs":[],"image":"https://log.cns.red/favicon.ico","logo":{"@type":"ImageObject","url":"https://log.cns.red/favicon.ico"}},"url":"https://log.cns.red/Spring-WebSocket/","keywords":"业务","thumbnailUrl":"https://upyun.thatcdn.cn/myself/typora/websocket-server-spring-boot.png","image":1}</script>
+  <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /><meta name="msvalidate.01" content="CA09795034E007CA1C59654A377C1726" /><link rel='stylesheet' href='https://public.thatcdn.cn/font/old_song/result.css' /><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.5.1/css/all.min.css"><link rel="stylesheet" href="/custom/css/ZYTimetmpl.css" /><meta itemprop="name" content="钟意博客"><meta itemprop="author" content="钟意"><meta itemprop="description" content="笔名钟意, 记录代码与生活."><meta name="sogou_site_verification" content="spLj7Zz5dI" /><meta itemprop="image" content="https://upyun.thatcdn.cn/hexo/stellar/image/shot.webp"><link rel="stylesheet" href="/custom/css/ZYGlobal.css"><link rel="stylesheet" href="/custom/css/ZYWaline.css"><link rel="stylesheet" href="/custom/css/ZYPage.css"><script type="text/javascript" src="/custom/js/header.js"></script><!-- Clarity tracking code for https://log.cns.red/ -->
+<script>    (function(c,l,a,r,i,t,y){        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);    })(window, document, "clarity", "script", "fi1zg7i5q5");</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-H6GM3XZWV7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-H6GM3XZWV7');
+</script>
+<!-- BaiDu-ZhanZhang
+<meta name="baidu-site-verification" content="codeva-8tnFVr706d" />
+<!-- BaiDu-Tongji -->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?233765a020502d5d6a92d4fe306d36c2";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+<body><div id="l_cover">
+
+</div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/favicon.ico" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">钟意博客</div><div class="sub normal cap">感谢你的阅读</div><div class="sub hover cap" style="opacity:0"> ThatCoder's Blog 钟意博客 那个码农</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/"><span>博客</span></a><a class="nav-item" title="笔记" href="/wiki/"><span>笔记</span></a><a class="nav-item" title="便签" href="/notes/"><span>便签</span></a><a class="nav-item" title="社交" href="/links/"><span>社交</span></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+<widget class="widget-wrapper related post-list"><div class="widget-header dis-select"><span class="name">专栏：SpringWithVue</span></div><div class="widget-body"><a class="item" href="/Web-Package/"><span class="title">Web技术构建桌面应用方案</span></a><a class="item active" href="/Spring-WebSocket/"><span class="title">SpringBoot WebSocket 代理模式、客户端模式</span><svg class="active-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M21 11.098v4.993c0 3.096 0 4.645-.734 5.321c-.35.323-.792.526-1.263.58c-.987.113-2.14-.907-4.445-2.946c-1.02-.901-1.529-1.352-2.118-1.47a2.225 2.225 0 0 0-.88 0c-.59.118-1.099.569-2.118 1.47c-2.305 2.039-3.458 3.059-4.445 2.945a2.238 2.238 0 0 1-1.263-.579C3 20.736 3 19.188 3 16.091v-4.994C3 6.81 3 4.666 4.318 3.333C5.636 2 7.758 2 12 2c4.243 0 6.364 0 7.682 1.332C21 4.665 21 6.81 21 11.098" opacity=".5"/><path fill="currentColor" d="M9 5.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5z"/></svg></a><a class="item" href="/OnlyOffice-Vue-Spring/"><span class="title">OnlyOffice集成到Vue与Spring项目</span></a><a class="item" href="/Spring-Pay-Ali/"><span class="title">SpringBoot集成支付宝支付的前后端相关逻辑</span></a></div></widget>
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/stellar-1.18.5-to-latest/"><span class="title">Stellar 1.18.5 迁移到 latest</span></a><a class="item title" href="/%E9%82%AE%E7%AE%B1%E6%A8%A1%E6%9D%BF%E9%9B%86/"><span class="title">邮件样式模板集</span></a><a class="item title" href="/Stellar-Timeline-More/"><span class="title">Stellar 提高时间线适配范围</span></a><a class="item title" href="/OnlyOffice-Vue-Spring/"><span class="title">OnlyOffice集成到Vue与Spring项目</span></a><a class="item title" href="/Tencent-WxRead-Daily/"><span class="title">微信读书自动阅读</span></a><a class="item title" href="/Blog-Load-Balance/"><span class="title">博客多平台负载均衡方案</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" style="grid-column: span 3;height:32px;padding: 0;" href="https://space.bilibili.com/1664687779" target="_blank" rel="external nofollow noopener noreferrer"><img height="32px" src="https://upyun.thatcdn.cn/public/img/icon/bilibili-banner.jpg"/></a><a class="social" style="grid-column: span 3;height:32px;padding: 0;" href="https://muselink.cc/naive" target="_blank" rel="external nofollow noopener noreferrer"><img height="32px" src="https://upyun.thatcdn.cn/public/img/icon/wechat-banner.jpg"/></a><a class="social" style="grid-column: span 3;height:32px;padding: 0;" href="https://github.com/tovarsh" target="_blank" rel="external nofollow noopener noreferrer"><img height="32px" src="https://upyun.thatcdn.cn/public/img/icon/github-banner.jpg"/></a><a class="social" href="javascript:ThemeChange('dark');" rel="noopener noreferrer"><img id="ThemeM" src="https://upyun.thatcdn.cn/public/img/icon/Moon.png"/></a><a class="social" href="javascript:ThemeChange('light');" rel="noopener noreferrer"><img id="ThemeL" src="https://upyun.thatcdn.cn/public/img/icon/Sun.png"/></a><a class="social" href="javascript:ThemeChange('auto');" rel="noopener noreferrer"><img id="ThemeAI" src="https://upyun.thatcdn.cn/public/img/icon/AI.png"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner top">
+    <div class="content">
+      <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" id="menu" href="/topic/">专栏</a><span class="sep"></span><a class="cap breadcrumb" id="proj" href="/Web-Package/">SpringWithVue</a></div>
+<div class="flex-row" id="post-meta"><a class="author" href="/author/ThatCoder/">钟意</a><span class="sep"></span><span class="text created"><time datetime="2025-06-07T08:00:00.000Z">2025-06-07</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-02-13T10:53:03.115Z">2026-02-13</time></span></div></div><div class="right"><div class="flex-row" id="post-meta" style="justify-content: flex-end;">
+            <span class="text updated" id="busuanzi_value_page_pv"></span><span class="text updated"> 阅</span>
+            <span class="sep updated"></span>
+            <span class="text">3.7k 字</span>
+            <span class="sep"></span>
+            <span class="text">18 分</span>
+        </div></div></div>
+      
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>SpringBoot WebSocket 代理模式、客户端模式</span></h1>
+        
+      </div>
+    </div>
+    
+    </div>
+    </div><article class="md-text content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><ol>
+<li>本文实现 上下游ws的代理功能、客户端发布功能</li>
+<li>开发语言：Spring Boot + Kotlin</li>
+<li>实现方式很多种，这里给出接口代码是思路，可以改 <code>@ServerEndpoint</code> 托管实现</li>
+</ol>
+<h2 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h2><blockquote>
+<p>用户连接为上游，被代理地址为下游。</p>
+</blockquote>
+<ol>
+<li>劫持控制修改上下游消息内容</li>
+<li>对上游进行鉴权</li>
+</ol>
+<h3 id="时序设计"><a href="#时序设计" class="headerlink" title="时序设计"></a>时序设计</h3><div class="tag-plugin image"><div class="image-bg" style="aspect-ratio:4094/2968;"><img class="lazy" src="https://upyun.thatcdn.cn/myself/typora/IWebSocketProxier.png" data-src="https://upyun.thatcdn.cn/myself/typora/IWebSocketProxier.png" alt="IWebSocketProxier时序图" data-fancybox="true"onerror="this.src=&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2rem' height='2rem' viewBox='0 0 24 24'%3E%3C!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --%3E%3Cpath fill='%23F44336' d='M22 12.698c-.002 1.47-.013 2.718-.096 3.743c-.097 1.19-.296 2.184-.74 3.009a4.2 4.2 0 0 1-.73.983c-.833.833-1.893 1.21-3.237 1.39C15.884 22 14.2 22 12.053 22h-.106c-2.148 0-3.83 0-5.144-.177c-1.343-.18-2.404-.557-3.236-1.39c-.738-.738-1.12-1.656-1.322-2.795c-.2-1.12-.236-2.512-.243-4.241Q1.999 12.737 2 12v-.054c0-2.148 0-3.83.177-5.144c.18-1.343.557-2.404 1.39-3.236s1.893-1.21 3.236-1.39c1.168-.157 2.67-.175 4.499-.177a.697.697 0 1 1 0 1.396c-1.855.002-3.234.018-4.313.163c-1.189.16-1.906.464-2.436.994S3.72 5.8 3.56 6.99C3.397 8.2 3.395 9.788 3.395 12v.784l.932-.814a2.14 2.14 0 0 1 2.922.097l3.99 3.99a1.86 1.86 0 0 0 2.385.207l.278-.195a2.79 2.79 0 0 1 3.471.209l2.633 2.37c.265-.557.423-1.288.507-2.32c.079-.972.09-2.152.091-3.63a.698.698 0 0 1 1.396 0' opacity='.5'/%3E%3Cpath fill='%23F44336' fill-rule='evenodd' d='M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m-1.47-7.03a.75.75 0 1 0-1.06 1.06l1.47 1.47l-1.47 1.47a.75.75 0 0 0 1.06 1.06l1.47-1.47l1.47 1.47a.75.75 0 1 0 1.06-1.06L18.56 6.5l1.47-1.47a.75.75 0 0 0-1.06-1.06L17.5 5.44z' clip-rule='evenodd'/%3E%3C/svg%3E&quot;"/><div class="lazy-icon" style="background-image:url(https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd);"></div></div><div class="image-meta"><span class="image-caption center">IWebSocketProxier时序图</span></div></div>
+
+<figure class="highlight text"><figcaption><span>时序代码</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs text">sequenceDiagram<br>    participant UpClient as 上游客户端<br>    participant Proxier as IWebSocketProxier<br>    participant DownClient as 下游服务<br>    participant Scheduler2 as 清理线程<br><br>    Note over UpClient,Proxier: 1. 上游连接建立<br>    UpClient-&gt;&gt;Proxier: WebSocket 握手<br>    activate Proxier<br>    Proxier--&gt;&gt;Proxier: afterConnectionEstablished(session)<br>    Proxier--&gt;&gt;Proxier: sessions[session.id] = WebSocketProxySession(...)<br>    Proxier--&gt;&gt;Proxier: onUpstreamOpen(proxy)<br>    deactivate Proxier<br><br>    Note over UpClient,Proxier: 2. 上游首条消息（授权）<br>    UpClient-&gt;&gt;Proxier: TextMessage(首次消息)<br>    activate Proxier<br>    Proxier--&gt;&gt;Proxier: handleMessage(session, message)<br>    Proxier--&gt;&gt;Proxier: onUpstreamFirstMessage(proxy, message)<br>    alt 授权失败<br>        Proxier--&gt;&gt;UpClient: sendMessage(授权失败通知)<br>        Proxier--&gt;&gt;Proxier: closeSession(session.id)<br>    else 授权成功<br>        Proxier--&gt;&gt;Proxier: proxy.authorized = true<br>        Proxier--&gt;&gt;Proxier: onAuthSuccess(proxy)<br>        Proxier--&gt;&gt;Proxier: connectDownstream(session.id)<br>        Proxier--&gt;&gt;Proxier: downstreamContexts[session.id].pending.offer(clone(message))<br>    end<br>    deactivate Proxier<br><br>    Note over UpClient,Proxier: 3. 上游后续消息<br>    UpClient-&gt;&gt;Proxier: TextMessage(后续消息)<br>    activate Proxier<br>    Proxier--&gt;&gt;Proxier: handleMessage<br>    alt !downConnected<br>        Proxier--&gt;&gt;Proxier: pending.offer(clone(message))<br>    else 已连接下游<br>        Proxier--&gt;&gt;DownClient: sendToDownstream(transformUpstream(message))<br>    end<br>    deactivate Proxier<br><br>    Note over DownClient,Proxier: 4. 下游连接建立完成<br>    DownClient-&gt;&gt;Proxier: 握手完成<br>    activate Proxier<br>    Proxier--&gt;&gt;Proxier: ctx.downConnected = true<br>    Proxier--&gt;&gt;Proxier: flush pending → sendToDownstream(...)<br>    deactivate Proxier<br><br>    Note over DownClient,Proxier: 5. 下游消息回传<br>    DownClient-&gt;&gt;Proxier: TextMessage(下游响应)<br>    activate Proxier<br>    Proxier--&gt;&gt;UpClient: proxy.session.sendMessage(transformDownstream(msg))<br>    deactivate Proxier<br><br>    Note over Scheduler2,Proxier: 6. 会话超时自动清理<br>    Scheduler2-&gt;&gt;Proxier: cleanupExpired()<br>    activate Proxier<br>    Proxier--&gt;&gt;Proxier: closeSession(超时 session.id)<br>    deactivate Proxier<br><br>    Note over UpClient,Proxier: 7. 上游主动关闭<br>    UpClient-&gt;&gt;Proxier: closeConnection<br>    activate Proxier<br>    Proxier--&gt;&gt;Proxier: afterConnectionClosed(session, status)<br>    Proxier--&gt;&gt;Proxier: closeSession(session.id)<br>    deactivate Proxier<br></code></pre></td></tr></table></figure>
+
+<h3 id="接口代码"><a href="#接口代码" class="headerlink" title="接口代码"></a>接口代码</h3><figure class="highlight kotlin"><figcaption><span>IWebSocketProxier</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper<br><span class="hljs-keyword">import</span> org.slf4j.LoggerFactory<br><span class="hljs-keyword">import</span> org.springframework.web.socket.*<br><span class="hljs-keyword">import</span> org.springframework.web.socket.client.WebSocketClient<br><span class="hljs-keyword">import</span> org.springframework.web.socket.handler.AbstractWebSocketHandler<br><span class="hljs-keyword">import</span> java.util.concurrent.*<br><span class="hljs-keyword">import</span> java.util.concurrent.atomic.AtomicBoolean<br><span class="hljs-keyword">import</span> java.util.concurrent.atomic.AtomicInteger<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 包装上游会话及其状态，用于管理授权和心跳</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> session WebSocket 上游会话</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> authorized 是否已通过授权验证</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> downConnected 下游连接是否已建立</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> lastHeartbeat 最近心跳时间戳（毫秒）</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">data</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketProxySession</span>(<br>    <span class="hljs-keyword">val</span> session: WebSocketSession,<br>    <span class="hljs-keyword">var</span> authorized: <span class="hljs-built_in">Boolean</span> = <span class="hljs-literal">false</span>,<br>    <span class="hljs-keyword">var</span> downConnected: <span class="hljs-built_in">Boolean</span> = <span class="hljs-literal">false</span>,<br>    <span class="hljs-keyword">var</span> lastHeartbeat: <span class="hljs-built_in">Long</span> = System.currentTimeMillis()<br>)<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 通用 WebSocket 代理抽象类</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * 负责管理上游和下游的连接生命周期、消息转发以及超时清理</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * 使用方式：</span><br><span class="hljs-comment"> * 1. 实现核心抽象方法：</span><br><span class="hljs-comment"> *    - registerPath: 定义代理路由</span><br><span class="hljs-comment"> *    - onUpstreamFirstMessage: 处理上游首条消息并进行授权</span><br><span class="hljs-comment"> *    - downstreamUri: 获取下游 URI</span><br><span class="hljs-comment"> *    - transformUpstream: 上游→下游 转换逻辑</span><br><span class="hljs-comment"> *    - transformDownstream: 下游→上游 转换逻辑</span><br><span class="hljs-comment"> * 2. 可选覆盖钩子：</span><br><span class="hljs-comment"> *    - onUpstreamOpen: 上游连接初始化</span><br><span class="hljs-comment"> *    - onAuthSuccess: 授权成功回调</span><br><span class="hljs-comment"> *    - onUpstreamFirstMessageIsNull: 授权失败处理</span><br><span class="hljs-comment"> *    - onSessionClosed: 会话关闭后处理</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> objectMapper 用于 JSON 序列化/反序列化</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> client WebSocket 客户端，用于建立下游连接</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> ThatCoder</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">IWebSocketProxier</span>(<br>    <span class="hljs-keyword">val</span> objectMapper: ObjectMapper,<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> client: WebSocketClient<br>) : AbstractWebSocketHandler() &#123;<br>    <span class="hljs-comment">/** 代理接入路径 */</span><br>    <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">val</span> registerPath: String<br><br>    <span class="hljs-comment">/** 会话超时时间，默认 10 分钟 */</span><br>    <span class="hljs-keyword">open</span> <span class="hljs-keyword">val</span> sessionTimeoutMillis: <span class="hljs-built_in">Long</span> = <span class="hljs-number">10</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> logger = LoggerFactory.getLogger(<span class="hljs-keyword">this</span>::<span class="hljs-keyword">class</span>.java)<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> sessions = ConcurrentHashMap&lt;String, WebSocketProxySession&gt;()<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> downstreamContexts = ConcurrentHashMap&lt;String, DownstreamContext&gt;()<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> scheduler = Executors.newSingleThreadScheduledExecutor(<br>        NamedThreadFactory(<span class="hljs-string">&quot;proxy-session-timeout-&quot;</span>)<br>    )<br><br>    <span class="hljs-keyword">init</span> &#123;<br>        <span class="hljs-comment">// 定期清理超时会话</span><br>        scheduler.scheduleAtFixedRate(<br>            &#123; cleanupExpired() &#125;,<br>            sessionTimeoutMillis,<br>            sessionTimeoutMillis,<br>            TimeUnit.MILLISECONDS<br>        )<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">afterConnectionEstablished</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>)</span></span> &#123;<br>        logger.info(<span class="hljs-string">&quot;Upstream connected: <span class="hljs-subst">$&#123;session.id&#125;</span>&quot;</span>)<br>        sessions[session.id] = WebSocketProxySession(session)<br>        onUpstreamOpen(sessions[session.id]!!)<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">handleMessage</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>        <span class="hljs-keyword">val</span> proxy = sessions[session.id] ?: <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">if</span> (!proxy.authorized) &#123;<br>            <span class="hljs-keyword">val</span> ok = onUpstreamFirstMessage(proxy, message)<br>            <span class="hljs-keyword">if</span> (!ok) &#123;<br>                onUpstreamFirstMessageIsNull(proxy)<br>                closeSession(session.id)<br>                <span class="hljs-keyword">return</span><br>            &#125;<br>            proxy.authorized = <span class="hljs-literal">true</span><br>            onAuthSuccess(proxy)<br>            connectDownstream(session.id)<br>            downstreamContexts[session.id]?.pending?.offer(clone(message))<br>            <span class="hljs-keyword">return</span><br>        &#125;<br>        <span class="hljs-keyword">val</span> ctx = downstreamContexts[session.id] ?: <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">if</span> (!ctx.downConnected.<span class="hljs-keyword">get</span>()) &#123;<br>            ctx.pending.offer(clone(message))<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            ctx.sendToDownstream(transformUpstream(message))<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">afterConnectionClosed</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>, status: <span class="hljs-type">CloseStatus</span>)</span></span> &#123;<br>        logger.info(<span class="hljs-string">&quot;Upstream closed: <span class="hljs-subst">$&#123;session.id&#125;</span>&quot;</span>)<br>        closeSession(session.id)<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 向所有上游会话发送心跳，维持长连接</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">sendHeartbeat</span><span class="hljs-params">()</span></span> &#123;<br>        <span class="hljs-keyword">val</span> ping = PingMessage()<br>        sessions.values.forEach &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                it.session.sendMessage(ping)<br>            &#125; <span class="hljs-keyword">catch</span> (_: Exception) &#123;<br>                <span class="hljs-comment">// 忽略发送失败</span><br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// ---------- 可覆盖钩子 ----------</span><br><br>    <span class="hljs-comment">/** 上游连接建立后回调 */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamOpen</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>)</span></span> = <span class="hljs-built_in">Unit</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 上游首条消息处理并授权</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> true 表示通过，false 则触发授权失败</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamFirstMessage</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">        proxy: <span class="hljs-type">WebSocketProxySession</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">        message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;</span></span><br><span class="hljs-params"><span class="hljs-function">    )</span></span>: <span class="hljs-built_in">Boolean</span><br><br>    <span class="hljs-comment">/** 授权失败发送给上游的消息 */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamFirstMessageIsNull</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>)</span></span> &#123;<br>        <span class="hljs-keyword">val</span> err = mapOf(<span class="hljs-string">&quot;finish&quot;</span> to <span class="hljs-literal">true</span>, <span class="hljs-string">&quot;error&quot;</span> to <span class="hljs-string">&quot;身份认证失败&quot;</span>)<br>        proxy.session.sendMessage(TextMessage(objectMapper.writeValueAsString(err)))<br>    &#125;<br><br>    <span class="hljs-comment">/** 授权成功后回调 */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onAuthSuccess</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>)</span></span> = <span class="hljs-built_in">Unit</span><br><br>    <span class="hljs-comment">/** 根据上游会话获取下游 URI */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">downstreamUri</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>)</span></span>: String<br><br>    <span class="hljs-comment">/** 上游→下游 消息转换 */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">transformUpstream</span><span class="hljs-params">(message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span>: WebSocketMessage&lt;*&gt;<br><br>    <span class="hljs-comment">/** 下游→上游 消息转换 */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">transformDownstream</span><span class="hljs-params">(message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span>: WebSocketMessage&lt;*&gt;<br><br>    <span class="hljs-comment">/** 会话关闭后回调 */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onSessionClosed</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>)</span></span> = <span class="hljs-built_in">Unit</span><br><br>    <span class="hljs-comment">// ---------- 内部逻辑 ----------</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 建立下游连接，并将后续消息路由到 DownstreamContext</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">connectDownstream</span><span class="hljs-params">(sessionId: <span class="hljs-type">String</span>)</span></span> &#123;<br>        <span class="hljs-keyword">val</span> proxy = sessions[sessionId]!!<br>        <span class="hljs-keyword">val</span> ctx = DownstreamContext(proxy)<br>        downstreamContexts[sessionId] = ctx<br>        client.execute(<span class="hljs-keyword">object</span> : AbstractWebSocketHandler() &#123;<br>            <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">afterConnectionEstablished</span><span class="hljs-params">(down: <span class="hljs-type">WebSocketSession</span>)</span></span> &#123;<br>                logger.info(<span class="hljs-string">&quot;Downstream connected for: <span class="hljs-variable">$sessionId</span>&quot;</span>)<br>                ctx.downConnected.<span class="hljs-keyword">set</span>(<span class="hljs-literal">true</span>)<br>                ctx.downstream = down<br>                <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>                    <span class="hljs-keyword">val</span> msg = ctx.pending.poll() ?: <span class="hljs-keyword">break</span><br>                    ctx.sendToDownstream(transformUpstream(msg))<br>                &#125;<br>            &#125;<br><br>            <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">handleMessage</span><span class="hljs-params">(down: <span class="hljs-type">WebSocketSession</span>, msg: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>                proxy.session.sendMessage(transformDownstream(msg))<br>            &#125;<br><br>            <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">afterConnectionClosed</span><span class="hljs-params">(down: <span class="hljs-type">WebSocketSession</span>, status: <span class="hljs-type">CloseStatus</span>)</span></span> &#123;<br>                logger.warn(<span class="hljs-string">&quot;Downstream closed early: <span class="hljs-subst">$&#123;status.code&#125;</span>&quot;</span>)<br>                closeSession(sessionId)<br>            &#125;<br>        &#125;, downstreamUri(proxy))<br>    &#125;<br><br>    <span class="hljs-comment">/** 关闭并清理指定会话 */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">closeSession</span><span class="hljs-params">(sessionId: <span class="hljs-type">String</span>)</span></span> &#123;<br>        sessions.remove(sessionId)?.also &#123; onSessionClosed(it) &#125;<br>        downstreamContexts.remove(sessionId)?.closeAll()<br>    &#125;<br><br>    <span class="hljs-comment">/** 清理超时会话 */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">cleanupExpired</span><span class="hljs-params">()</span></span> &#123;<br>        <span class="hljs-keyword">val</span> now = System.currentTimeMillis()<br>        sessions.entries<br>            .filter &#123; now - it.value.lastHeartbeat &gt; sessionTimeoutMillis &#125;<br>            .forEach &#123; closeSession(it.key) &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/** 克隆消息以避免并发问题 */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">clone</span><span class="hljs-params">(msg: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span>: WebSocketMessage&lt;*&gt; = <span class="hljs-keyword">when</span> (msg) &#123;<br>        <span class="hljs-keyword">is</span> TextMessage -&gt; TextMessage(msg.payload)<br>        <span class="hljs-keyword">is</span> BinaryMessage -&gt; BinaryMessage(msg.payload.asReadOnlyBuffer())<br>        <span class="hljs-keyword">else</span> -&gt; msg<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 管理下游消息发送及队列</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DownstreamContext</span>(proxy: WebSocketProxySession) &#123;<br>        <span class="hljs-meta">@Volatile</span> <span class="hljs-keyword">var</span> downstream: WebSocketSession? = <span class="hljs-literal">null</span><br>        <span class="hljs-keyword">val</span> downConnected = AtomicBoolean(<span class="hljs-literal">false</span>)<br>        <span class="hljs-keyword">val</span> pending = ConcurrentLinkedQueue&lt;WebSocketMessage&lt;*&gt;&gt;()<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> executor: ExecutorService = ThreadPoolExecutor(<br>            <span class="hljs-number">4</span>, <span class="hljs-number">16</span>, <span class="hljs-number">60</span>, TimeUnit.SECONDS,<br>            LinkedBlockingQueue(<span class="hljs-number">1000</span>),<br>            NamedThreadFactory(<span class="hljs-string">&quot;proxy-send-<span class="hljs-subst">$&#123;proxy.session.id&#125;</span>&quot;</span>)<br>        )<br><br>        <span class="hljs-comment">/** 将消息异步发送到下游 */</span><br>        <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">sendToDownstream</span><span class="hljs-params">(msg: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>            executor.execute &#123;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    downstream?.sendMessage(msg)<br>                &#125; <span class="hljs-keyword">catch</span> (e: Exception) &#123;<br>                    LoggerFactory.getLogger(<span class="hljs-string">&quot;DownstreamLogger&quot;</span>).error(<span class="hljs-string">&quot;Send downstream failed&quot;</span>, e)<br>                &#125;<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-comment">/** 关闭下游并清理资源 */</span><br>        <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">closeAll</span><span class="hljs-params">()</span></span> &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                downstream?.close()<br>            &#125; <span class="hljs-keyword">catch</span> (_: Exception) &#123;<br>            &#125;<br>            executor.shutdownNow()<br>            pending.clear()<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/** 为线程池生成可读性线程名 */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">NamedThreadFactory</span>(prefix: String) : ThreadFactory &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> cnt = AtomicInteger(<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> name = <span class="hljs-string">&quot;<span class="hljs-subst">$&#123;prefix&#125;</span>-<span class="hljs-subst">$&#123;cnt.getAndIncrement()&#125;</span>&quot;</span><br>        <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">newThread</span><span class="hljs-params">(r: <span class="hljs-type">Runnable</span>)</span></span> = Thread(r, name)<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="实现示例"><a href="#实现示例" class="headerlink" title="实现示例"></a>实现示例</h3><blockquote>
+<p>以代理 FunAsr 为例，统一上下游的消息类型，对上游进行身份权限认证</p>
+</blockquote>
+<figure class="highlight kotlin"><figcaption><span>AsrProxier</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.fieldJust<br><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.fieldRemove<br><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.fieldRename<br><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.putMap<br><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.toObjectNode<br><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.toTextMessage<br><span class="hljs-keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper<br><span class="hljs-keyword">import</span> com.fasterxml.jackson.databind.node.ArrayNode<br><span class="hljs-keyword">import</span> org.slf4j.LoggerFactory<br><span class="hljs-keyword">import</span> org.springframework.stereotype.Component<br><span class="hljs-keyword">import</span> org.springframework.web.socket.CloseStatus<br><span class="hljs-keyword">import</span> org.springframework.web.socket.TextMessage<br><span class="hljs-keyword">import</span> org.springframework.web.socket.WebSocketMessage<br><span class="hljs-keyword">import</span> org.springframework.web.socket.client.WebSocketClient<br><br><span class="hljs-comment">/** ASR 代理实现 */</span><br><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">AsrProxier</span>(<br>    objectMapper: ObjectMapper,<br>    webSocketClient: WebSocketClient,<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> akService: IAKService<br>) : IWebSocketProxier(objectMapper, webSocketClient) &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> paramProxy = mapOf(<br>        <span class="hljs-string">&quot;id&quot;</span> to <span class="hljs-string">&quot;wav_name&quot;</span>,<br>        <span class="hljs-string">&quot;finish&quot;</span> to <span class="hljs-string">&quot;is_speaking&quot;</span>,<br>        <span class="hljs-string">&quot;answer&quot;</span> to <span class="hljs-string">&quot;text&quot;</span><br>    )<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> logger = LoggerFactory.getLogger(<span class="hljs-keyword">this</span>::<span class="hljs-keyword">class</span>.java)<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> registerPath = <span class="hljs-string">&quot;/ws/asr&quot;</span><br><br>    <span class="hljs-comment">// 鉴权服务</span><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamFirstMessage</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span>: <span class="hljs-built_in">Boolean</span> &#123;<br>        <span class="hljs-keyword">val</span> node = message.toObjectNode(objectMapper) ?: <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>        <span class="hljs-keyword">val</span> ak = node.<span class="hljs-keyword">get</span>(<span class="hljs-string">&quot;ak&quot;</span>)?.asText() ?: <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>        <span class="hljs-keyword">return</span> akService.check(ak)<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">downstreamUri</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>)</span></span> = <span class="hljs-string">&quot;ws://localhost:10095&quot;</span><br><br>    <span class="hljs-comment">// 处理上游消息适配成FUNASR接收类型</span><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">transformUpstream</span><span class="hljs-params">(message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> = <span class="hljs-keyword">when</span> (message) &#123;<br>        <span class="hljs-keyword">is</span> TextMessage -&gt; runCatching &#123;<br>            <span class="hljs-keyword">val</span> forward = message.toObjectNode(objectMapper)?.fieldRename(paramProxy) ?: <span class="hljs-keyword">return</span> message<br>            forward.<span class="hljs-keyword">get</span>(<span class="hljs-string">&quot;is_speaking&quot;</span>)?.let &#123;<br>                <span class="hljs-keyword">val</span> finished = it.asBoolean(<span class="hljs-literal">false</span>)<br>                <span class="hljs-keyword">if</span> (!finished) forward.putMap(mapOf(<br>                    <span class="hljs-string">&quot;language&quot;</span> to <span class="hljs-string">&quot;zn&quot;</span>,<br>                    <span class="hljs-string">&quot;itn&quot;</span> to <span class="hljs-literal">false</span>,<br>                    <span class="hljs-string">&quot;hotwords&quot;</span> to <span class="hljs-string">&quot;&#123;\&quot;阿里巴巴\&quot;:20,\&quot;hello world\&quot;:40&#125;&quot;</span><br>                ))<br>                forward.put(<span class="hljs-string">&quot;is_speaking&quot;</span>, !finished)<br>            &#125;<br>            forward.<span class="hljs-keyword">get</span>(<span class="hljs-string">&quot;mode&quot;</span>)?.let &#123;<br>                <span class="hljs-keyword">if</span> (listOf(<span class="hljs-string">&quot;mixed&quot;</span>,<span class="hljs-string">&quot;online&quot;</span>).contains(it.asText())) &#123;<br>                    <span class="hljs-keyword">val</span> arr = objectMapper.createArrayNode().add(<span class="hljs-number">5</span>).add(<span class="hljs-number">10</span>).add(<span class="hljs-number">5</span>)<br>                    forward.<span class="hljs-keyword">set</span>&lt;ArrayNode&gt;(<span class="hljs-string">&quot;chunk_size&quot;</span>, arr)<br>                    forward.put(<span class="hljs-string">&quot;chunk_interval&quot;</span>, <span class="hljs-number">10</span>)<br>                    <span class="hljs-keyword">if</span> (it.asText() == <span class="hljs-string">&quot;mixed&quot;</span>) forward.put(<span class="hljs-string">&quot;mode&quot;</span>, <span class="hljs-string">&quot;2pass&quot;</span>)<br>                &#125;<br>            &#125;<br>            forward.fieldRemove(listOf(<span class="hljs-string">&quot;ak&quot;</span>))<br>            logger.info(<span class="hljs-string">&quot;transformUpstream: <span class="hljs-variable">$forward</span>&quot;</span>)<br>            forward.toTextMessage(objectMapper)<br>        &#125;.getOrDefault(message)<br>        <span class="hljs-keyword">else</span> -&gt; message<br>    &#125;<br><br>    <span class="hljs-comment">// 处理下游消息适配成客户接收类型</span><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">transformDownstream</span><span class="hljs-params">(message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> = <span class="hljs-keyword">when</span> (message) &#123;<br>        <span class="hljs-keyword">is</span> TextMessage -&gt; &#123;<br>            <span class="hljs-keyword">val</span> forward = message.toObjectNode(objectMapper)<br>                ?.fieldRename(paramProxy.toMutableMap().plus(<span class="hljs-string">&quot;finish&quot;</span> to <span class="hljs-string">&quot;is_final&quot;</span>), <span class="hljs-literal">true</span>)<br>                ?: <span class="hljs-keyword">return</span> message<br>            forward.putMap(mapOf(<br>                <span class="hljs-string">&quot;mode&quot;</span> to <span class="hljs-keyword">when</span> (forward.<span class="hljs-keyword">get</span>(<span class="hljs-string">&quot;mode&quot;</span>)?.asText() ?: <span class="hljs-string">&quot;2pass-offline&quot;</span>) &#123;<br>                    <span class="hljs-string">&quot;2pass-online&quot;</span> -&gt; <span class="hljs-string">&quot;online&quot;</span><br>                    <span class="hljs-string">&quot;2pass-offline&quot;</span> -&gt; <span class="hljs-string">&quot;offline&quot;</span><br>                    <span class="hljs-keyword">else</span> -&gt; forward.<span class="hljs-keyword">get</span>(<span class="hljs-string">&quot;mode&quot;</span>).asText()<br>                &#125;,<br>                <span class="hljs-string">&quot;timestamp&quot;</span> to System.currentTimeMillis()<br>            ))<br>            forward.fieldJust(paramProxy.keys.plus(<span class="hljs-string">&quot;mode&quot;</span>).toList())<br>            logger.info(<span class="hljs-string">&quot;transformDownstream: <span class="hljs-variable">$forward</span>&quot;</span>)<br>            forward.toTextMessage(objectMapper)<br>        &#125;<br>        <span class="hljs-keyword">else</span> -&gt; message<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamFirstMessageIsNull</span><span class="hljs-params">(proxy: <span class="hljs-type">WebSocketProxySession</span>)</span></span> &#123;<br>        <span class="hljs-keyword">super</span>.onUpstreamFirstMessageIsNull(proxy)<br>        proxy.session.close(CloseStatus.POLICY_VIOLATION)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h2><blockquote>
+<p>客户端模式是自己为发布器，用户为上游，自己作为下游。</p>
+</blockquote>
+<ol>
+<li>用户认证</li>
+<li>会话对象维护</li>
+<li>心跳维护</li>
+<li>消息广播</li>
+<li>消息过滤广播</li>
+<li>单例模式</li>
+</ol>
+<h3 id="时序设计-1"><a href="#时序设计-1" class="headerlink" title="时序设计"></a>时序设计</h3><div class="tag-plugin image"><div class="image-bg" style="aspect-ratio:4094/2968;"><img class="lazy" src="https://upyun.thatcdn.cn/myself/typora/IWebSocketPublisher.png" data-src="https://upyun.thatcdn.cn/myself/typora/IWebSocketPublisher.png" alt="IWebSocketPublisher时序图" data-fancybox="true"onerror="this.src=&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2rem' height='2rem' viewBox='0 0 24 24'%3E%3C!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --%3E%3Cpath fill='%23F44336' d='M22 12.698c-.002 1.47-.013 2.718-.096 3.743c-.097 1.19-.296 2.184-.74 3.009a4.2 4.2 0 0 1-.73.983c-.833.833-1.893 1.21-3.237 1.39C15.884 22 14.2 22 12.053 22h-.106c-2.148 0-3.83 0-5.144-.177c-1.343-.18-2.404-.557-3.236-1.39c-.738-.738-1.12-1.656-1.322-2.795c-.2-1.12-.236-2.512-.243-4.241Q1.999 12.737 2 12v-.054c0-2.148 0-3.83.177-5.144c.18-1.343.557-2.404 1.39-3.236s1.893-1.21 3.236-1.39c1.168-.157 2.67-.175 4.499-.177a.697.697 0 1 1 0 1.396c-1.855.002-3.234.018-4.313.163c-1.189.16-1.906.464-2.436.994S3.72 5.8 3.56 6.99C3.397 8.2 3.395 9.788 3.395 12v.784l.932-.814a2.14 2.14 0 0 1 2.922.097l3.99 3.99a1.86 1.86 0 0 0 2.385.207l.278-.195a2.79 2.79 0 0 1 3.471.209l2.633 2.37c.265-.557.423-1.288.507-2.32c.079-.972.09-2.152.091-3.63a.698.698 0 0 1 1.396 0' opacity='.5'/%3E%3Cpath fill='%23F44336' fill-rule='evenodd' d='M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m-1.47-7.03a.75.75 0 1 0-1.06 1.06l1.47 1.47l-1.47 1.47a.75.75 0 0 0 1.06 1.06l1.47-1.47l1.47 1.47a.75.75 0 1 0 1.06-1.06L18.56 6.5l1.47-1.47a.75.75 0 0 0-1.06-1.06L17.5 5.44z' clip-rule='evenodd'/%3E%3C/svg%3E&quot;"/><div class="lazy-icon" style="background-image:url(https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd);"></div></div><div class="image-meta"><span class="image-caption center">IWebSocketPublisher时序图</span></div></div>
+
+<figure class="highlight text"><figcaption><span>时序代码</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs text">sequenceDiagram<br>    participant Client as 客户端<br>    participant Publisher as IWebSocketPublisher<br>    participant Scheduler as 定时清理线程<br><br>    Note over Client,Publisher: 1. 连接建立与初始化<br>    Client-&gt;&gt;Publisher: WebSocket 握手并建立连接<br>    activate Publisher<br>    Publisher--&gt;&gt;Publisher: afterConnectionEstablished(session)<br>    Publisher--&gt;&gt;Publisher: onUpstreamOpen(session)<br>    deactivate Publisher<br><br>    Note over Client,Publisher: 2. 首次消息（身份验证）<br>    Client-&gt;&gt;Publisher: TextMessage(首次消息)<br>    activate Publisher<br>    Publisher--&gt;&gt;Publisher: handleMessage(session, message)<br>    Publisher--&gt;&gt;Publisher: onUpstreamFirstMessage(session, message)<br>    alt 验证失败<br>        Publisher--&gt;&gt;Client: onUpstreamFirstMessageIsNull → 发送错误提示<br>        Publisher--&gt;&gt;Client: session.close(POLICY_VIOLATION)<br>    else 验证成功<br>        Publisher--&gt;&gt;Publisher: sessions[session.id] = WebSocketSenderSession(...)<br>        Publisher--&gt;&gt;Publisher: onAuthSuccess(...)<br>    end<br>    deactivate Publisher<br><br>    Note over Client,Publisher: 3. 后续业务消息处理<br>    Client-&gt;&gt;Publisher: TextMessage(业务消息) 或 PingMessage(心跳)<br>    activate Publisher<br>    Publisher--&gt;&gt;Publisher: handleMessage<br>    alt 心跳<br>        Publisher--&gt;&gt;Publisher: 更新 lastHeartbeat<br>    else 业务消息<br>        Publisher--&gt;&gt;Publisher: onUpstreamMessage(...)<br>    end<br>    deactivate Publisher<br><br>    Note over Scheduler,Publisher: 4. 会话超时清理<br>    Scheduler-&gt;&gt;Publisher: cleanupExpired()<br>    activate Publisher<br>    Publisher--&gt;&gt;Publisher: 关闭过期 session → onSessionClosed<br>    deactivate Publisher<br><br>    Note over Publisher,Client: 5. 发布/广播/心跳<br>    Publisher-&gt;&gt;Client: publishAll/publishByFilter/publishSender<br>    Publisher--&gt;&gt;Publisher: transformPublish(...)<br>    Publisher--&gt;&gt;Client: sendMessage(转换后消息)<br>    Publisher-&gt;&gt;Client: sendHeartbeat() → PingMessage()<br><br></code></pre></td></tr></table></figure>
+
+
+<h3 id="接口代码-1"><a href="#接口代码-1" class="headerlink" title="接口代码"></a>接口代码</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper<br><span class="hljs-keyword">import</span> org.slf4j.LoggerFactory<br><span class="hljs-keyword">import</span> org.springframework.web.socket.*<br><span class="hljs-keyword">import</span> org.springframework.web.socket.handler.AbstractWebSocketHandler<br><span class="hljs-keyword">import</span> java.util.concurrent.*<br><span class="hljs-keyword">import</span> java.util.concurrent.atomic.AtomicInteger<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 会话、用户信息的包装类</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">data</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;(<br>    <span class="hljs-keyword">val</span> session: WebSocketSession,<br>    <span class="hljs-keyword">val</span> user: T,<br>    <span class="hljs-comment">/** 心跳超时标志 */</span><br>    <span class="hljs-keyword">val</span> lastHeartbeat: <span class="hljs-built_in">Long</span> = System.currentTimeMillis()<br>)<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * WebSocket 发布者抽象接口，用于构建支持用户认证、心跳维护、消息广播的通用 WebSocket 服务。</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * ### 使用方式</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * #### 必须实现</span><br><span class="hljs-comment"> * &gt; 继承本类并实现以下核心抽象方法</span><br><span class="hljs-comment"> * - [registerPath]：注册的路径，WebSocket 接入入口</span><br><span class="hljs-comment"> * - [onUpstreamFirstMessage]：处理上游客户端首次连接时的消息，一般用于身份验证，返回的用户信息将用于标识会话；若返回 null，连接将被关闭</span><br><span class="hljs-comment"> * - [onUpstreamMessage]：处理客户端后续发送的消息</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * #### 可选重写</span><br><span class="hljs-comment"> * - [onUpstreamOpen]：连接建立但未发送任何消息时的初始化回调</span><br><span class="hljs-comment"> * - [onSessionClosed]：连接关闭后的回调处理</span><br><span class="hljs-comment"> * - [onUpstreamFirstMessageIsNull]：首次消息认证失败时的回调，默认发送错误信息</span><br><span class="hljs-comment"> * - [onAuthSuccess]：首次消息认证通过后的回调</span><br><span class="hljs-comment"> * - [transformPublish]：发送消息前进行的消息变换</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * ### 会话管理</span><br><span class="hljs-comment"> * - 会话信息以 [WebSocketSenderSession] 包装，包含 `session`、用户信息及心跳时间</span><br><span class="hljs-comment"> * - 默认 10 分钟未活跃会话将被关闭，可通过 [sessionTimeoutMillis] 调整</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * ### 发布功能</span><br><span class="hljs-comment"> * - [publishAll]：向所有连接发布消息</span><br><span class="hljs-comment"> * - [publishByFilter]：根据过滤条件发布消息</span><br><span class="hljs-comment"> * - [publishSender]：向单个连接发送消息</span><br><span class="hljs-comment"> * - [sendHeartbeat]：向所有连接发送 Ping 消息，维持长连接</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> objectMapper Jackson 用于 JSON 序列化/反序列化</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> T 用户类型，需由 [onUpstreamFirstMessage] 提供</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> ThatCoder</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">IWebSocketPublisher</span>&lt;<span class="hljs-type">T</span>&gt;(<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> objectMapper: ObjectMapper<br>) : AbstractWebSocketHandler() &#123;<br><br>    <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">val</span> registerPath: String<br><br>    <span class="hljs-comment">/** 会话超时毫秒数 默认十分钟 */</span><br>    <span class="hljs-keyword">val</span> sessionTimeoutMillis: <span class="hljs-built_in">Long</span> = <span class="hljs-number">10</span>*<span class="hljs-number">60</span>*<span class="hljs-number">1000</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> logger = LoggerFactory.getLogger(<span class="hljs-keyword">this</span>::<span class="hljs-keyword">class</span>.java)<br><br>    <span class="hljs-comment">/** 所有会话管理器 */</span><br>    <span class="hljs-keyword">val</span> sessions = ConcurrentHashMap&lt;String, WebSocketSenderSession&lt;T&gt;&gt;()<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> scheduler = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory(<span class="hljs-string">&quot;session-timeout-&quot;</span>))<br><br>    <span class="hljs-keyword">init</span> &#123;<br>        <span class="hljs-comment">// 定期清理超时会话</span><br>        scheduler.scheduleAtFixedRate(&#123; cleanupExpired() &#125;, sessionTimeoutMillis, sessionTimeoutMillis, TimeUnit.MILLISECONDS)<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">afterConnectionEstablished</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>)</span></span> &#123;<br>        logger.info(<span class="hljs-string">&quot;Client connected: <span class="hljs-subst">$&#123;session.id&#125;</span>&quot;</span>)<br>        onUpstreamOpen(session)<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">handleMessage</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>        <span class="hljs-comment">// 首次消息处理授权与注册</span><br>        <span class="hljs-keyword">if</span> (!sessions.containsKey(session.id)) &#123;<br>            <span class="hljs-keyword">val</span> user = onUpstreamFirstMessage(session, message)<br>            <span class="hljs-keyword">if</span> (user == <span class="hljs-literal">null</span>) &#123;<br>                onUpstreamFirstMessageIsNull(session)<br>                session.close(CloseStatus.POLICY_VIOLATION)<br>                <span class="hljs-keyword">return</span><br>            &#125;<br>            sessions[session.id] = WebSocketSenderSession(session, user)<br>            onAuthSuccess(sessions[session.id]!!)<br>            logger.info(<span class="hljs-string">&quot;Session registered: <span class="hljs-subst">$&#123;session.id&#125;</span> -&gt; <span class="hljs-variable">$user</span>&quot;</span>)<br>            <span class="hljs-keyword">return</span><br>        &#125;<br>        <span class="hljs-comment">// 心跳更新或具体消息处理</span><br>        onUpstreamMessage(sessions[session.id]!!, message)<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">afterConnectionClosed</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>, status: <span class="hljs-type">CloseStatus</span>)</span></span> &#123;<br>        logger.info(<span class="hljs-string">&quot;Client closed: <span class="hljs-subst">$&#123;session.id&#125;</span> (<span class="hljs-subst">$&#123;status.reason&#125;</span>)&quot;</span>)<br>        sessions.remove(session.id)?.let &#123; onSessionClosed(it) &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 全局发布消息</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> message 消息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">publishAll</span><span class="hljs-params">(message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>        sessions.values.forEach &#123; sender -&gt; send(sender, message) &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 按过滤器发布</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> filter 过滤器</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> message 消息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">publishByFilter</span><span class="hljs-params">(filter: (<span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;) -&gt; <span class="hljs-type">Boolean</span>, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>        sessions.values.filter(filter).forEach &#123; send(it, message) &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 发送消息给指定会话</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sender 会话</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> message 消息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">publishSender</span><span class="hljs-params">(sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>        send(sender, message)<br>    &#125;<br><br>    <span class="hljs-comment">/** 发送心跳 */</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">sendHeartbeat</span><span class="hljs-params">()</span></span> &#123;<br>        <span class="hljs-keyword">val</span> ping = PingMessage()<br>        sessions.values.forEach &#123;<br>            <span class="hljs-keyword">try</span> &#123; it.session.sendMessage(ping) &#125; <span class="hljs-keyword">catch</span> (_: Exception) &#123;&#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// ========== 子类扩展点 ===========</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 会话首次创建时调用</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> session 会话</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamOpen</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>)</span></span> = <span class="hljs-built_in">Unit</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 会话消息</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sender 会话对象</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> message 消息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamMessage</span><span class="hljs-params">(sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 会话关闭时调用</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sender 会话对象</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onSessionClosed</span><span class="hljs-params">(sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;)</span></span> = <span class="hljs-built_in">Unit</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 会话首条消息</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * 通常在验证用户权限时调用</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> session 会话</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> message 消息</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> 用户信息 如果返回null则触发 onUpstreamFirstMessageIsNull</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@see</span> onUpstreamFirstMessageIsNull</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamFirstMessage</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">        session: <span class="hljs-type">WebSocketSession</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">        message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;</span></span><br><span class="hljs-params"><span class="hljs-function">    )</span></span>: T?<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 会话首条消息处理为空时调用</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> session 会话</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamFirstMessageIsNull</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>)</span></span> &#123;<br>        <span class="hljs-keyword">val</span> err = mapOf(<span class="hljs-string">&quot;error&quot;</span> to <span class="hljs-string">&quot;身份认证失败&quot;</span>)<br>        session.sendMessage(TextMessage(objectMapper.writeValueAsString(err)))<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 认证成功后执行</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sender 会话</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onAuthSuccess</span><span class="hljs-params">(sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;)</span></span> = <span class="hljs-built_in">Unit</span><br><br>    <span class="hljs-comment">/** 清理超时会话 */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">cleanupExpired</span><span class="hljs-params">()</span></span> &#123;<br>        <span class="hljs-keyword">val</span> now = System.currentTimeMillis()<br>        sessions.values.filter &#123; now - it.lastHeartbeat &gt; sessionTimeoutMillis &#125;<br>            .forEach &#123;<br>                <span class="hljs-keyword">try</span> &#123; it.session.close(CloseStatus.SESSION_NOT_RELIABLE) &#125; <span class="hljs-keyword">catch</span> (_: Exception) &#123;&#125;<br>                sessions.remove(it.session.id)<br>                logger.info(<span class="hljs-string">&quot;Session timeout removed: <span class="hljs-subst">$&#123;it.session.id&#125;</span>&quot;</span>)<br>            &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">send</span><span class="hljs-params">(sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>        <span class="hljs-keyword">if</span> (!sender.session.isOpen) <span class="hljs-keyword">return</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            sender.session.sendMessage(transformPublish(message, sender))<br>        &#125; <span class="hljs-keyword">catch</span> (e: Exception) &#123;<br>            logger.error(<span class="hljs-string">&quot;Publish to <span class="hljs-subst">$&#123;sender.session.id&#125;</span> failed&quot;</span>, e)<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">open</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">transformPublish</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">        message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;,</span></span><br><span class="hljs-params"><span class="hljs-function">        sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">T</span>&gt;</span></span><br><span class="hljs-params"><span class="hljs-function">    )</span></span>: WebSocketMessage&lt;*&gt; = message<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">NamedThreadFactory</span>(prefix: String) : ThreadFactory &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> cnt = AtomicInteger(<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> name = prefix + cnt.getAndIncrement()<br>        <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">newThread</span><span class="hljs-params">(r: <span class="hljs-type">Runnable</span>)</span></span>: Thread &#123;<br>            <span class="hljs-keyword">return</span> Thread(r, name)<br>        &#125;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="实现示例-1"><a href="#实现示例-1" class="headerlink" title="实现示例"></a>实现示例</h3><blockquote>
+<p>以实现聊天室为例，这个例子有对单对群发送演示</p>
+</blockquote>
+<blockquote>
+<p>兼容单例模式，只使用 publishSender 方法即可, 相当于一对一服务</p>
+</blockquote>
+<ul>
+<li>实现后可以多开几个网页测试 <a target="_blank" rel="noopener" href="http://www.websocket-test.com/">websocket测试网页</a></li>
+<li>链接本地 <code>ws://localhost:8080/ws/chat</code>后可以发送一个body鉴权进群 <code>&#123;&quot;ak&quot;: &quot;123456&quot;, &quot;message&quot;: &quot;我是卢本伟&quot;, &quot;name&quot;: &quot;卢本伟&quot;&#125;</code></li>
+<li>进群后续可以不发送 ak，已经有了sessionId对应的用户, 后面发送 <code>&#123;&quot;message&quot;: &quot;欢迎来到卢本伟广场&quot;&#125;</code> 即可</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.toObjectNode<br><span class="hljs-keyword">import</span> com.bidr.waterx.transpond.config.extension.toTextMessage<br><span class="hljs-keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper<br><span class="hljs-keyword">import</span> org.springframework.stereotype.Component<br><span class="hljs-keyword">import</span> org.springframework.web.socket.TextMessage<br><span class="hljs-keyword">import</span> org.springframework.web.socket.WebSocketMessage<br><span class="hljs-keyword">import</span> org.springframework.web.socket.WebSocketSession<br><br><span class="hljs-keyword">data</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ChatUser</span>(<span class="hljs-keyword">val</span> userid: String, <span class="hljs-keyword">val</span> name: String)<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 聊天室发布者</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ChatPublisher</span>(<span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> objectMapper: ObjectMapper) : IWebSocketPublisher&lt;ChatUser&gt;(objectMapper) &#123;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> registerPath = <span class="hljs-string">&quot;/ws/chat&quot;</span><br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamFirstMessage</span><span class="hljs-params">(session: <span class="hljs-type">WebSocketSession</span>, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span>: ChatUser? &#123;<br>        <span class="hljs-keyword">val</span> message = message.toObjectNode() ?: <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span><br>        <span class="hljs-keyword">val</span> ak = message.<span class="hljs-keyword">get</span>(<span class="hljs-string">&quot;ak&quot;</span>)?.asText() ?: <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span><br>        <span class="hljs-keyword">val</span> name = message.<span class="hljs-keyword">get</span>(<span class="hljs-string">&quot;name&quot;</span>)?.asText() ?: <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span><br>        <span class="hljs-keyword">if</span> (ak != <span class="hljs-string">&quot;123456&quot;</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span><br>        <span class="hljs-comment">// 创建用户</span><br>        <span class="hljs-keyword">val</span> user = ChatUser( session.id, name)<br>        <span class="hljs-comment">// 给该用户发送欢迎信息</span><br>        session.sendMessage(TextMessage(<span class="hljs-string">&quot;Hi, <span class="hljs-variable">$name</span>. Please chat friendly!&quot;</span>))<br>        <span class="hljs-comment">// 群发用户入群提示</span><br>        publishAll(TextMessage(<span class="hljs-string">&quot;<span class="hljs-variable">$name</span>&#x27;ve joined the chat room.&quot;</span>))<br>        <span class="hljs-keyword">return</span> user<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onSessionClosed</span><span class="hljs-params">(sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">ChatUser</span>&gt;)</span></span> &#123;<br>        <span class="hljs-comment">// 群发用户离开提示</span><br>        publishAll(TextMessage(<span class="hljs-string">&quot;<span class="hljs-subst">$&#123;sender.user.name&#125;</span> has left the chat room.&quot;</span>))<br>    &#125;<br><br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onUpstreamMessage</span><span class="hljs-params">(sender: <span class="hljs-type">WebSocketSenderSession</span>&lt;<span class="hljs-type">ChatUser</span>&gt;, message: <span class="hljs-type">WebSocketMessage</span>&lt;*&gt;)</span></span> &#123;<br>        <span class="hljs-comment">// 转发用户消息至群聊</span><br>        publishAll(objectMapper.createObjectNode().apply &#123;<br>            put(<span class="hljs-string">&quot;type&quot;</span>, <span class="hljs-string">&quot;chat&quot;</span>)<br>            putPOJO(<span class="hljs-string">&quot;user&quot;</span>, sender.user)<br>            putPOJO(<span class="hljs-string">&quot;message&quot;</span>, message.toObjectNode())<br>        &#125;.toTextMessage())<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="路由注册"><a href="#路由注册" class="headerlink" title="路由注册"></a>路由注册</h2><blockquote>
+<p>两个接口都有 <code>registerPath</code> 所以我们可以让 Spring 收集 IWebSocketPublisher、IWebSocketProxier 的实现类，自动注册里面的路由实现</p>
+</blockquote>
+<figure class="highlight kotlin"><figcaption><span>WebSocketConfig</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-keyword">package</span> cn.uwant.auto.config<br><br><span class="hljs-keyword">import</span> IWebSocketProxier<br><span class="hljs-keyword">import</span> IWebSocketPublisher<br><span class="hljs-keyword">import</span> jakarta.websocket.ContainerProvider<br><span class="hljs-keyword">import</span> org.springframework.context.<span class="hljs-keyword">annotation</span>.Bean<br><span class="hljs-keyword">import</span> org.springframework.context.<span class="hljs-keyword">annotation</span>.Configuration<br><span class="hljs-keyword">import</span> org.springframework.web.socket.client.WebSocketClient<br><span class="hljs-keyword">import</span> org.springframework.web.socket.client.standard.StandardWebSocketClient<br><span class="hljs-keyword">import</span> org.springframework.web.socket.config.<span class="hljs-keyword">annotation</span>.EnableWebSocket<br><span class="hljs-keyword">import</span> org.springframework.web.socket.config.<span class="hljs-keyword">annotation</span>.WebSocketConfigurer<br><span class="hljs-keyword">import</span> org.springframework.web.socket.config.<span class="hljs-keyword">annotation</span>.WebSocketHandlerRegistry<br><span class="hljs-keyword">import</span> org.springframework.context.<span class="hljs-keyword">annotation</span>.Lazy<br><span class="hljs-keyword">import</span> kotlin.collections.map<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * WebSocket配置</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> ThatCoder</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Configuration</span><br><span class="hljs-meta">@EnableWebSocket</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketConfig</span>(<br>    <span class="hljs-meta">@Lazy</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> proxies: List&lt;IWebSocketProxier&gt;,<br>    <span class="hljs-meta">@Lazy</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> publishers: List&lt;IWebSocketPublisher&lt;*&gt;&gt;<br>) : WebSocketConfigurer &#123;<br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">registerWebSocketHandlers</span><span class="hljs-params">(registry: <span class="hljs-type">WebSocketHandlerRegistry</span>)</span></span> &#123;<br>        proxies.map &#123;<br>            registry.addHandler(it, it.registerPath).setAllowedOrigins(<span class="hljs-string">&quot;*&quot;</span>)<br>        &#125;<br>        publishers.map &#123;<br>            registry.addHandler(it, it.registerPath).setAllowedOrigins(<span class="hljs-string">&quot;*&quot;</span>)<br>        &#125;<br>    &#125;<br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">webSocketClient</span><span class="hljs-params">()</span></span>: WebSocketClient &#123;<br>        <span class="hljs-keyword">val</span> container = ContainerProvider.getWebSocketContainer()<br>        <span class="hljs-keyword">return</span> StandardWebSocketClient(container)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="相关错误"><a href="#相关错误" class="headerlink" title="相关错误"></a>相关错误</h2><blockquote>
+<p>见 BUG 专栏</p>
+</blockquote>
+<div class="tag-plugin link dis-select"><a class="link-card plain" title="Spring-WebSocket-Bug" href="/bug/spring-websocket-bug/" cardlink autofill="icon,desc"><div class="left"><span class="title">Spring-WebSocket-Bug</span><span class="cap link footnote">https://log.cns.red/bug/spring-websocket-bug/</span></div><div class="right"><div class="lazy img" data-bg="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/link/8f277b4ee0ecd.svg"></div></div></a></div></article>
+<div class="article-footer">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文为 <a href="/author/ThatCoder/">钟意</a> 撰写, 采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议, 转载请注明出处。</p>
+</div>
+    </section>
+    
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://log.cns.red/Spring-WebSocket/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item weibo" target="_blank" rel="external nofollow noopener noreferrer" href="https://service.weibo.com/share/share.php?url=https://log.cns.red/Spring-WebSocket/&title=SpringBoot WebSocket 代理模式、客户端模式 - 钟意博客&pics=https://upyun.thatcdn.cn/myself/typora/websocket-server-spring-boot.png&summary=Spring+WebSocket的相关实践"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/80c07e4dbb303.svg" /></a><a class="social share-item email" href="mailto:?subject=SpringBoot WebSocket 代理模式、客户端模式 - 钟意博客&amp;body=https://log.cns.red/Spring-WebSocket/"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/a1b00e20f425d.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://log.cns.red/Spring-WebSocket/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/bug/spring-websocket-bug/">Spring WebSocket 错误</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/bug/spring-aop-failure-dynamic/">Spring AOP 调用自身失效</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>快来参与讨论吧~</p>
+
+    </section>
+    <section class='body cmt-body waline'>
+      
+
+<div id="waline_container" class="waline_thread"><svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer footnote"><hr><div class="text"><p style="text-align:center" >
+本站由 <a style="font-weight: bold;" href="/author/ThatCoder/">钟意</a> 使用 <a style="font-weight: bold;" target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1">Stellar 1.33.1</a> 主题创建。
+<br>
+由 <a style="font-weight: bold;" target="_blank" rel="noopener" href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral">又拍云</a> 提供CDN加速/云存储服务
+<br>
+由 <a style="font-weight: bold;" target="_blank" rel="noopener" href="https://vercel.com/">vercel</a>、<a style="font-weight: bold;" target="_blank" rel="noopener" href="https://www.netlify.com/">netlify</a>、<a style="font-weight: bold;" target="_blank" rel="noopener" href="https://www.cloudflare.com/">cloudflare</a> 提供托管服务
+<br>
+<a href="https://beian.miit.gov.cn/" target="_blank">赣ICP备2021003671号</a>
+<br>
+<!--不蒜子计数器-->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!--添加一个访问量-->
+<span>总访问 <span id="busuanzi_value_site_pv" style="font-weight: bold;"></span> 次 
+<!--本页访问 <span id="busuanzi_value_page_pv" style="font-weight: bold;"></span> 次</span>-->
+<div id="siteruntime"></div>
+</p>
+<script>
+function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000
+    var minutes = seconds * 60
+    var hours = minutes * 60
+    var days = hours * 24
+    var years = days * 365
+    var today = new Date()
+    var todayYear = today.getFullYear()
+    var todayMonth = today.getMonth()
+    var todayDate = today.getDate()
+    var todayHour = today.getHours()
+    var todayMinute = today.getMinutes()
+    var todaySecond = today.getSeconds()
+    var t1 = Date.UTC(2020,4,30,08,00,00)
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond)
+    var diff = t2-t1
+    var diffYears = Math.floor(diff/years)
+    var diffDays = Math.floor((diff/days)-diffYears*365)
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours)
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes)
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds)
+    document.getElementById("siteruntime").innerHTML="<p style=\"text-align:center\">小破站已颠沛流离 "+diffYears+" 年 "+diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒</p>"
+}
+siteTime();
+</script>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="auto"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="toc-text">代理模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E5%BA%8F%E8%AE%BE%E8%AE%A1"><span class="toc-text">时序设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A5%E5%8F%A3%E4%BB%A3%E7%A0%81"><span class="toc-text">接口代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%A4%BA%E4%BE%8B"><span class="toc-text">实现示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%A8%A1%E5%BC%8F"><span class="toc-text">客户端模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E5%BA%8F%E8%AE%BE%E8%AE%A1-1"><span class="toc-text">时序设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A5%E5%8F%A3%E4%BB%A3%E7%A0%81-1"><span class="toc-text">接口代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%A4%BA%E4%BE%8B-1"><span class="toc-text">实现示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E6%B3%A8%E5%86%8C"><span class="toc-text">路由注册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E9%94%99%E8%AF%AF"><span class="toc-text">相关错误</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":"log.cns.red","officialHosts":["localhost","blog.thatcoder.cn","log.cns.red","log.sov.red","log.tov.red","hexo.thatcoder.cn","komintern.vercel.app","thatcoder.vercel.app","thatcoder.netlify.app","blog.tovarsh.com","tovarsh.github.io","cnlog.pages.dev"],"encoded":"bG9nLmNucy5yZWQ="};
+  window.canonical["param"] = {"permalink":"https://log.cns.red/Spring-WebSocket/","checklink":"/js/plugins/video.js"};
+  // Fix: Ensure page is at the correct top position on data load
+  if (history.scrollRestoration) {
+    history.scrollRestoration = 'auto';
+  }
+  (function() {
+    const scrollHandler = () => {
+      const wikiCover = document.querySelector('#l_cover .l_cover.wiki');
+      const startEl = document.getElementById('start');
+      if (wikiCover && startEl) {
+        window.scrollTo(0, startEl.offsetTop);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    };
+    if (document.readyState !== 'loading') scrollHandler();
+    else document.addEventListener('DOMContentLoaded', scrollHandler);
+  })();
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"post, page, docs","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      // 倒序遍历避免 splice 后的索引问题
+      for (let index = this.list.length - 1; index >= 0; index--) {
+        const e = this.list[index];
+        if (e.name === name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    // 已加载脚本缓存
+    _loadedScripts: new Set(),
+
+    // 已加载元素缓存 (使用 WeakSet 追踪元素实例,避免 PJAX 导航时的状态混淆)
+    _loadedElements: new WeakSet(),
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      // 如果脚本已加载，直接返回
+      if (utils._loadedScripts.has(src)) {
+        resolve();
+        return;
+      }
+      var script = document.createElement('script');
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        utils._loadedScripts.add(src);
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    // PJAX 事件监听器管理
+    _pjaxListeners: new Set(),
+    
+    jq: (fn, pjax = true) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+      if (pjax && !fn._pjax_registered) {
+        document.addEventListener('pjax:complete', fn);
+        fn._pjax_registered = true;
+        utils._pjaxListeners.add(fn); // 追踪监听器以便清理
+      }
+    },
+    
+    // 清理所有 PJAX 事件监听器
+    cleanupPjaxListeners: () => {
+      utils._pjaxListeners.forEach(fn => {
+        document.removeEventListener('pjax:complete', fn);
+        fn._pjax_registered = false;
+      });
+      utils._pjaxListeners.clear();
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length === 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      // 检查元素实例是否已加载 (而不是检查属性)
+      if (el && utils._loadedElements.has(el)) {
+        return;
+      }
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            // 标记元素实例为已加载
+            if (el) utils._loadedElements.add(el);
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+
+    // 插件初始化管理器 - 统一处理 DOMContentLoaded 和 pjax:complete 事件
+    _pluginInitializers: [],
+    _pluginCleanups: new Map(), // 存储每个插件的清理函数
+    
+    initPlugin: (initFn, name, options = {}) => {
+      if (!initFn || typeof initFn !== 'function') return;
+      
+      // 避免重复注册
+      const pluginName = name || initFn.name;
+      if (utils._pluginInitializers.some(p => p.name === pluginName)) return;
+      
+      // 包装初始化函数，添加防重复执行的保护
+      const wrappedInit = () => {
+        try {
+          // 在执行前先清理旧的资源
+          if (utils._pluginCleanups.has(pluginName)) {
+            const cleanup = utils._pluginCleanups.get(pluginName);
+            if (typeof cleanup === 'function') {
+              cleanup();
+            }
+          }
+          
+          // 执行初始化，可能返回清理函数
+          const cleanup = initFn();
+          
+          // 如果初始化函数返回了清理函数，保存它
+          if (typeof cleanup === 'function') {
+            utils._pluginCleanups.set(pluginName, cleanup);
+          }
+        } catch (error) {
+          console.error(`[Plugin ${pluginName}] 初始化失败:`, error);
+        }
+      };
+      
+      utils._pluginInitializers.push({ 
+        fn: wrappedInit, 
+        name: pluginName,
+        options: options 
+      });
+      
+      // 如果 DOM 已经加载完成，立即执行
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        wrappedInit();
+      } else {
+        // 否则等待 DOMContentLoaded
+        window.addEventListener('DOMContentLoaded', wrappedInit, { once: true });
+      }
+    },
+
+    // 重新初始化所有插件（用于 PJAX 等场景）
+    reinitPlugins: () => {
+      utils._pluginInitializers.forEach(plugin => {
+        // 跳过标记为不需要重新初始化的插件
+        if (plugin.options.skipReinit) return;
+        
+        try {
+          plugin.fn();
+        } catch (error) {
+          console.error(`[Plugin ${plugin.name}] 重新初始化失败:`, error);
+        }
+      });
+    },
+    
+    // 清理所有插件资源
+    cleanupPlugins: () => {
+      utils._pluginCleanups.forEach((cleanup, name) => {
+        try {
+          cleanup();
+        } catch (error) {
+          console.error(`[Plugin ${name}] 清理失败:`, error);
+        }
+      });
+      utils._pluginCleanups.clear();
+    },
+    
+    // 清理所有资源（用于页面卸载或重置）
+    cleanupAll: () => {
+      utils.cleanupPlugins();
+      utils.cleanupPjaxListeners();
+    },
+  };
+
+  // 自动处理 PJAX 事件
+  document.addEventListener('pjax:before', () => {
+    // 在导航前清理旧的 PJAX 监听器（如果需要重新注册）
+    // 注意：这里不清理，因为监听器应该是持久的
+    // utils.cleanupPjaxListeners();
+  });
+  
+  document.addEventListener('pjax:complete', () => {
+    utils.reinitPlugins();
+  });
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  import { init } from 'https://gcore.jsdelivr.net/npm/@waline/client@3.1/dist/waline.js';
+
+  const lazyload = false;
+  
+  function initWaline() {
+    const el = document.getElementById('waline_container');
+    if (!el) return;
+
+    function load_waline() {
+      utils.css('https://gcore.jsdelivr.net/npm/@waline/client@3.1/dist/waline.css');
+      utils.css('https://gcore.jsdelivr.net/npm/@waline/client@3.1/dist/waline-meta.css');
+
+      const path = el.getAttribute('comment_id') ?? decodeURI(window.location.pathname);
+      const waline = init(Object.assign({"js":"https://gcore.jsdelivr.net/npm/@waline/client@3.1/dist/waline.js","css":"https://gcore.jsdelivr.net/npm/@waline/client@3.1/dist/waline.css","meta_css":"https://gcore.jsdelivr.net/npm/@waline/client@3.1/dist/waline-meta.css","serverURL":"https://cmt.cns.red/","commentCount":true,"pageview":false,"search":false,"locale":{"placeholder":"  遇事不决, 可问春风..."},"emoji":["https://upyun.thatcdn.cn/public/web/emojis/bilibili","https://upyun.thatcdn.cn/public/web/emojis/qq","https://upyun.thatcdn.cn/public/web/emojis/tieba","https://upyun.thatcdn.cn/public/web/emojis/weibo"],"reaction":["https://upyun.thatcdn.cn/public/web/emojis/bilibili/bb_thumbsup.png","https://upyun.thatcdn.cn/public/web/emojis/bilibili/bb_cute.png","https://upyun.thatcdn.cn/public/web/emojis/bilibili/bb_sunglasses.png","https://upyun.thatcdn.cn/public/web/emojis/bilibili/bb_crazy.png","https://upyun.thatcdn.cn/public/web/emojis/bilibili/bb_trollface.png"],"meta":["nick","mail","link"],"imageUploader":{"fileName":"file","tokenName":"Authorization","api":"https://lsky.thatcoder.cn/api/v1/upload","token":"Bearer 6|x9vHGJGHAnjqbO0PGEE5vM7r9S9hdqFA9bmdESdm","resp":"data.links.url"}}, {
+        el: '#waline_container',
+        path: path,
+        
+          imageUploader: function(file) {
+            const headers = new Headers();
+            headers.set('Accept', 'application/json');
+            
+              headers.set('Authorization', 'Bearer 6|x9vHGJGHAnjqbO0PGEE5vM7r9S9hdqFA9bmdESdm')
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            return fetch('https://lsky.thatcoder.cn/api/v1/upload',{
+              method: 'POST',
+              body: formData,
+              headers: headers
+              }).then((resp) => resp.json())
+                .then((resp) => resp.data.links.url)
+          },
+        
+      }));
+    }
+    
+    util.viewportLazyload(el, load_waline, lazyload);
+  }
+  
+  // Store in global stellar namespace for PJAX reinitialization
+  window.stellar = window.stellar || {};
+  window.stellar.initComments = window.stellar.initComments || {};
+  window.stellar.initComments.waline = initWaline;
+  
+  // Initialize on page load
+  initWaline();
+</script>
+
+
+
+
+<script defer>
+  const initServices = () => {
+    // 用于存储需要清理的资源
+    let timers = [];
+    
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        const cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(cardlinks);
+          });
+        }
+      } else if (id == 'ghinfo') {
+        const els = document.querySelectorAll('.ds-ghinfo');
+        if (els.length > 0) {
+          utils.js(js, { defer: true });
+        }
+      } else if (id == 'voice') {
+        const voiceAudios = document.querySelectorAll('.voice>audio');
+        if (voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        const videos = document.querySelectorAll('.video>video');
+        if (videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        const files = document.querySelectorAll('.chat-file');
+        if (files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || id == 'memos' || id == 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          }, false);
+        }
+      }
+    }
+
+    // search
+    if (ctx.search && typeof searchFunc === 'function') {
+      const $inputArea = $("input#search-input");
+      if ($inputArea.length > 0 && !$inputArea[0]._searchInitialized) {
+        const path = ctx.search.path.startsWith('/') ? ctx.root + ctx.search.path.substring(1) : ctx.root + ctx.search.path;
+        const filter = $inputArea.attr('data-filter') || '';
+        searchFunc(path, filter, 'search-wrapper', 'search-input', 'search-result');
+        // 标记为已初始化，防止重复绑定
+        $inputArea[0]._searchInitialized = true;
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+    let firstAdjustInterval = null;
+    let mainInterval = null;
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      const date = new Date();
+      const sec = date.getSeconds();
+      firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+      timers.push(firstAdjustInterval);
+
+      function firstAdjustTime() {
+        NowTime();
+        if (firstAdjustInterval) {
+          clearInterval(firstAdjustInterval);
+          firstAdjustInterval = null;
+        }
+        mainInterval = setInterval(NowTime, 1000 * 60);
+        timers.push(mainInterval);
+      }
+
+      function NowTime() {
+        for (let i = 0; i < phoneTimes.length; ++i) {
+          const timeSpan = phoneTimes[i];
+          const date = new Date();
+          const hour = date.getHours();
+          const min = date.getMinutes();
+          timeSpan.innerHTML = check(hour) + ":" + check(min);
+        }
+      };
+
+      function check(val) {
+        if (val < 10) {
+          return ("0" + val);
+        }
+        return (val);
+      }
+    }
+
+    // chat quote - 存储事件监听器以便清理
+    const quoteClickHandlers = new Map();
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      const handler = function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      };
+      quote.addEventListener('click', handler);
+      quoteClickHandlers.set(quote, handler); // 保存处理器引用
+    });
+
+    // 返回清理函数，用于清理定时器和观察器
+    return () => {
+      // 清理所有定时器（包括可能未完成的 firstAdjustInterval）
+      timers.forEach(timer => {
+        if (timer) clearInterval(timer);
+      });
+      timers = [];
+      if (firstAdjustInterval) {
+        clearInterval(firstAdjustInterval);
+        firstAdjustInterval = null;
+      }
+      if (mainInterval) {
+        clearInterval(mainInterval);
+        mainInterval = null;
+      }
+      
+      // 断开观察器
+      if (chat_quote_obverser) {
+        chat_quote_obverser.disconnect();
+      }
+      
+      // 移除所有 click 事件监听器
+      quoteClickHandlers.forEach((handler, quote) => {
+        quote.removeEventListener('click', handler);
+      });
+      quoteClickHandlers.clear();
+    };
+  };
+
+  utils.initPlugin(initServices, 'services');
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.swiper-slide img, .md-text.content p>img, .md-text.content li img , .wl-content img, waline_container .vcontent img, .timeline .body .image img,  .timeline .gallery img`,
+    css: `https://cdn.bootcdn.net/ajax/libs/fancyapps-ui/5.0.22/fancybox/fancybox.min.css`,
+    js: `https://cdn.bootcdn.net/ajax/libs/fancyapps-ui/5.0.22/fancybox/fancybox.umd.min.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  utils.initPlugin(() => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  }, 'swiper');
+</script>
+
+  <script defer src="https://jsd.onmicrosoft.cn/gh/qxchuckle/Post-Summary-AI@6.0/chuckle-post-ai.min.js"></script>
+  <script defer>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      new ChucklePostAI(Object.assign({
+        el: 'article.content',
+        css: `/css/_plugins/tianli_gpt`
+      }, JSON.parse(`{"enable":true,"js":"https://jsd.onmicrosoft.cn/gh/qxchuckle/Post-Summary-AI@6.0/chuckle-post-ai.min.js","field":"post","key":"S-1JPGL6X0UZPIJ6S6","total_length":1000,"typewriter":true,"summary_directly":true,"rec_method":"web","hide_shuttle":true,"summary_toggle":false,"interface":{"name":"AI摘要","introduce":"我是文章辅助AI: QX-AI，点击下方的按钮，让我生成本文简介、推荐相关文章等。","version":"GPT","button":["介绍自己","推荐文章","生成摘要","矩阵穿梭"]}}`)))
+    });
+  </script>
+
+
+
+
+<!-- inject -->
+<script type="text/javascript" src="/custom/js/ZYUtil.js"></script><script type="text/javascript" src="/custom/js/ZYDark.js"></script><script type="text/javascript" src="/custom/js/ZYCategory.js"></script><script type="text/javascript" src="/custom/js/ZYCode.js"></script><script type="text/javascript" src="/custom/js/timetmpl.js"></script>
+</div></body></html>
